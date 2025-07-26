@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องคำนวณดอกเบี้ย</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0f9ff;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        
+        @media (max-width: 640px) {
+            .table-container {
+                max-width: 100%;
+                overflow-x: auto;
+            }
+        }
+        
+        tr.even-row {
+            background-color: #edf2f7; /* เพิ่มความเข้มของสีพื้นหลังแถวคู่ */
+        }
+        
+        tr.odd-row {
+            background-color: #ffffff;
+        }
+        
+        tr:hover {
+            background-color: #e6f0fd; /* เพิ่มความเข้มของสี hover */
+        }
+        
+        thead tr {
+            background-color: #e2e8f0 !important; /* เพิ่มความเข้มของสีหัวตาราง */
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-4xl overflow-hidden">
+            <div class="bg-blue-600 p-4 sm:p-6 text-white">
+                <h1 class="text-xl sm:text-2xl font-bold">เครื่องคำนวณดอกเบี้ย</h1>
+                <p class="text-blue-100 text-sm sm:text-base">กรอกข้อมูลเพื่อคำนวณดอกเบี้ยและยอดชำระรายเดือน</p>
+            </div>
+            
+            <div class="p-4 sm:p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="principal" class="block text-sm font-medium text-gray-700 mb-1">จำนวนเงินต้น (บาท)</label>
+                            <input type="number" id="principal" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="ระบุจำนวนเงินต้น">
+                        </div>
+                        
+                        <div>
+                            <label for="rate" class="block text-sm font-medium text-gray-700 mb-1">อัตราดอกเบี้ย (%)</label>
+                            <div class="flex space-x-2">
+                                <input type="number" id="rate" step="0.01" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="ระบุอัตราดอกเบี้ย">
+                                <select id="rateType" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                    <option value="yearly">ต่อปี</option>
+                                    <option value="monthly">ต่อเดือน</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="months" class="block text-sm font-medium text-gray-700 mb-1">ระยะเวลา (เดือน)</label>
+                            <input type="number" id="months" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="ระบุจำนวนเดือน">
+                        </div>
+                        
+                        <div>
+                            <label for="interestType" class="block text-sm font-medium text-gray-700 mb-1">ประเภทดอกเบี้ย</label>
+                            <select id="interestType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="simple">ดอกเบี้ยธรรมดา</option>
+                                <option value="compound">ดอกเบี้ยทบต้น</option>
+                            </select>
+                        </div>
+                        
+                        <button id="calculate" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">คำนวณ</button>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 sm:p-5 rounded-lg">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">ผลการคำนวณ</h2>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-sm text-gray-600">เงินต้น</p>
+                                <p id="resultPrincipal" class="text-lg font-medium">0.00 บาท</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">อัตราดอกเบี้ย</p>
+                                <p id="resultRate" class="text-lg font-medium">0.00% ต่อปี</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">ระยะเวลา</p>
+                                <p id="resultTime" class="text-lg font-medium">0 เดือน</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">ดอกเบี้ยรวม</p>
+                                <p id="resultInterest" class="text-lg font-medium">0.00 บาท</p>
+                            </div>
+                            <div class="pt-2 border-t border-gray-200">
+                                <p class="text-sm text-gray-600">ยอดรวมทั้งสิ้น</p>
+                                <p id="resultTotal" class="text-xl font-bold text-blue-600">0.00 บาท</p>
+                            </div>
+                            <div class="pt-2 border-t border-gray-200">
+                                <p class="text-sm text-gray-600">ค่างวดต่อเดือน</p>
+                                <p id="resultMonthlyPayment" class="text-xl font-bold text-green-600">0.00 บาท</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h3 class="text-md font-semibold text-gray-800 mb-2">ตารางแสดงรายละเอียด</h3>
+                            <div class="table-container overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+                                <table class="min-w-full">
+                                    <thead>
+                                        <tr>
+                                            <th class="py-2 px-2 sm:px-3 text-left text-xs font-medium text-gray-700">งวดที่</th>
+                                            <th class="py-2 px-2 sm:px-3 text-left text-xs font-medium text-gray-700">เงินต้นคงเหลือ</th>
+                                            <th class="py-2 px-2 sm:px-3 text-left text-xs font-medium text-gray-700">ดอกเบี้ย</th>
+                                            <th class="py-2 px-2 sm:px-3 text-left text-xs font-medium text-gray-700">เงินต้น</th>
+                                            <th class="py-2 px-2 sm:px-3 text-left text-xs font-medium text-gray-700">ยอดชำระ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resultTable" class="text-xs sm:text-sm">
+                                        <!-- ข้อมูลจะถูกเพิ่มโดย JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('calculate').addEventListener('click', calculateInterest);
+        
+        // เพิ่ม event listener สำหรับการคำนวณทันทีเมื่อมีการเปลี่ยนแปลงข้อมูล
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('change', calculateInterest);
+            element.addEventListener('keyup', calculateInterest);
+        });
+        
+        function calculateInterest() {
+            // รับค่าจากฟอร์ม
+            const principal = parseFloat(document.getElementById('principal').value) || 0;
+            const inputRate = parseFloat(document.getElementById('rate').value) || 0;
+            const rateType = document.getElementById('rateType').value;
+            const months = parseInt(document.getElementById('months').value) || 0;
+            const interestType = document.getElementById('interestType').value;
+            
+            // แปลงอัตราดอกเบี้ยเป็นต่อปี
+            let annualRate = inputRate;
+            if (rateType === 'monthly') {
+                annualRate = inputRate * 12;
+            }
+            
+            // แปลงเวลาเป็นปี
+            const timeInYears = months / 12;
+            
+            let interest = 0;
+            let total = 0;
+            let monthlyPayment = 0;
+            
+            // คำนวณดอกเบี้ย
+            if (interestType === 'simple') {
+                // ดอกเบี้ยธรรมดา
+                interest = principal * (annualRate / 100) * timeInYears;
+                total = principal + interest;
+                
+                // คำนวณค่างวดต่อเดือน (เงินต้น + ดอกเบี้ย หารเท่าๆ กัน)
+                monthlyPayment = months > 0 ? total / months : 0;
+                
+            } else {
+                // ดอกเบี้ยทบต้น
+                // คำนวณค่างวดต่อเดือนด้วยสูตร PMT
+                const monthlyRate = (annualRate / 100) / 12;
+                
+                if (monthlyRate === 0 || months === 0) {
+                    monthlyPayment = principal / months;
+                } else {
+                    monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+                }
+                
+                total = monthlyPayment * months;
+                interest = total - principal;
+            }
+            
+            // แสดงผลลัพธ์
+            document.getElementById('resultPrincipal').textContent = formatCurrency(principal) + ' บาท';
+            document.getElementById('resultRate').textContent = inputRate.toFixed(2) + '% ' + (rateType === 'yearly' ? 'ต่อปี' : 'ต่อเดือน') + 
+                                                              (rateType === 'monthly' ? ' (' + annualRate.toFixed(2) + '% ต่อปี)' : '');
+            document.getElementById('resultTime').textContent = months + ' เดือน';
+            document.getElementById('resultInterest').textContent = formatCurrency(interest) + ' บาท';
+            document.getElementById('resultTotal').textContent = formatCurrency(total) + ' บาท';
+            document.getElementById('resultMonthlyPayment').textContent = formatCurrency(monthlyPayment) + ' บาท';
+            
+            // สร้างตารางแสดงรายละเอียด
+            generateTable(principal, annualRate, months, interestType, monthlyPayment);
+        }
+        
+        function generateTable(principal, annualRate, months, interestType, monthlyPayment) {
+            const tableBody = document.getElementById('resultTable');
+            tableBody.innerHTML = '';
+            
+            // ถ้าไม่มีข้อมูลระยะเวลา ไม่ต้องสร้างตาราง
+            if (months === 0 || principal === 0) {
+                return;
+            }
+            
+            // จำกัดจำนวนงวดที่แสดงไม่เกิน 12 งวด หรือตามจำนวนเดือนที่กำหนด
+            const displayMonths = Math.min(months, 12);
+            
+            let remainingPrincipal = principal;
+            const monthlyRate = (annualRate / 100) / 12;
+            
+            for (let i = 1; i <= displayMonths; i++) {
+                const row = document.createElement('tr');
+                
+                // กำหนด class สำหรับแรเงาสลับแถว
+                if (i % 2 === 0) {
+                    row.classList.add('even-row');
+                } else {
+                    row.classList.add('odd-row');
+                }
+                
+                // คำนวณดอกเบี้ยและเงินต้นในแต่ละงวด
+                let monthlyInterest = 0;
+                let monthlyPrincipal = 0;
+                
+                if (interestType === 'simple') {
+                    // ดอกเบี้ยธรรมดา - แบ่งจ่ายเท่ากันทุกเดือน
+                    monthlyInterest = (principal * (annualRate / 100) * (months / 12)) / months;
+                    monthlyPrincipal = principal / months;
+                    remainingPrincipal = principal - (monthlyPrincipal * i);
+                } else {
+                    // ดอกเบี้ยทบต้น - คำนวณแบบลดต้นลดดอก
+                    monthlyInterest = remainingPrincipal * monthlyRate;
+                    monthlyPrincipal = monthlyPayment - monthlyInterest;
+                    remainingPrincipal = remainingPrincipal - monthlyPrincipal;
+                }
+                
+                // ป้องกันค่าติดลบในงวดสุดท้าย
+                if (remainingPrincipal < 0) remainingPrincipal = 0;
+                
+                // สร้างเซลล์ในตาราง
+                row.innerHTML = `
+                    <td class="py-2 px-2 sm:px-3 border-t border-gray-200">${i}</td>
+                    <td class="py-2 px-2 sm:px-3 border-t border-gray-200">${formatCurrency(remainingPrincipal)}</td>
+                    <td class="py-2 px-2 sm:px-3 border-t border-gray-200">${formatCurrency(monthlyInterest)}</td>
+                    <td class="py-2 px-2 sm:px-3 border-t border-gray-200">${formatCurrency(monthlyPrincipal)}</td>
+                    <td class="py-2 px-2 sm:px-3 border-t border-gray-200 font-medium">${formatCurrency(monthlyPayment)}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            }
+            
+            // ถ้ามีงวดมากกว่า 12 เดือน ให้แสดงงวดสุดท้ายด้วย
+            if (months > 12) {
+                const lastRow = document.createElement('tr');
+                lastRow.classList.add('bg-blue-50');
+                lastRow.innerHTML = `
+                    <td colspan="5" class="py-2 px-2 sm:px-3 text-center text-gray-500 border-t border-gray-200">
+                        ... แสดงเฉพาะ 12 งวดแรก จากทั้งหมด ${months} งวด ...
+                    </td>
+                `;
+                tableBody.appendChild(lastRow);
+            }
+        }
+        
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'965444c3f0733e68',t:'MTc1MzUzNjgwNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
