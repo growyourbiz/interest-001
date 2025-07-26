@@ -1,0 +1,67 @@
+/* style.css */
+
+/* import font Sarabun */
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+
+/* กำหนด font-family และพื้นหลังโดยรวมของหน้าเว็บ */
+body {
+    font-family: 'Sarabun', sans-serif;
+    background-color: #f0f9ff; /* สีพื้นหลังฟ้าอ่อน */
+    scroll-behavior: smooth; /* ทำให้การเลื่อนหน้าเป็นไปอย่างนุ่มนวล */
+}
+
+html {
+    scroll-behavior: smooth; /* ทำให้การเลื่อนหน้าเป็นไปอย่างนุ่มนวล (ย้ำอีกครั้งเพื่อความชัวร์) */
+}
+
+/* ซ่อนปุ่มเพิ่ม/ลดตัวเลขใน input type="number" สำหรับ WebKit browsers (Chrome, Safari) */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* ซ่อนปุ่มเพิ่ม/ลดตัวเลขใน input type="number" สำหรับ Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* การปรับแต่งสำหรับหน้าจอขนาดเล็ก (Mobile responsiveness) */
+@media (max-width: 640px) {
+    .table-container {
+        max-width: 100%; /* ทำให้ตารางไม่เกินขอบจอ */
+        overflow-x: auto; /* เพิ่ม Scrollbar แนวนอนถ้าตารางกว้างเกิน */
+    }
+}
+
+/* สีพื้นหลังสลับแถวในตาราง */
+tr.even-row {
+    background-color: #edf2f7; /* สีพื้นหลังแถวคู่ (เทาอ่อน) */
+}
+
+tr.odd-row {
+    background-color: #ffffff; /* สีพื้นหลังแถวคี่ (ขาว) */
+}
+
+/* สีพื้นหลังเมื่อวางเมาส์เหนือแถวในตาราง */
+tr:hover {
+    background-color: #e6f0fd; /* สีฟ้าอ่อนเมื่อ hover */
+}
+
+/* สีพื้นหลังของหัวตาราง */
+thead tr {
+    background-color: #e2e8f0 !important; /* สีเทาเข้มสำหรับหัวตาราง */
+}
+
+/* สไตล์เพิ่มเติมสำหรับเซลล์ตาราง เพื่อให้ดูดีขึ้น */
+table th,
+table td {
+    border-bottom: 1px solid #e2e8f0; /* เส้นแบ่งแถว */
+    text-align: left;
+    padding: 8px 12px;
+}
+
+/* สไตล์สำหรับข้อความ error (ถ้ามี) */
+.text-red-600 { /* ใช้ Tailwind class แต่ถ้าจะให้ชัดเจนก็เขียนแยกก็ได้ */
+    color: #dc3545; /* สีแดง */
+}
